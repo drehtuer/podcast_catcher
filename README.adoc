@@ -1,0 +1,58 @@
+= Yet another Podcast/RSS/Atom catcher
+
+include::doc/.attributes-page.adoc[]
+
+:url-feeddl: https://github.com/drehtuer/feeddl
+:url-greg: https://github.com/manolomartinez/greg
+:url-stagger: https://pypi.org/project/stagger
+
+A small application that pulls podcasts from the world wide web.
+It aims to be very flexible in the way the retrieved files are named, since this is a feature I'm missing in other pod catchers.
+
+All configuration is done via a configuration file, no user interface is needed.
+It's not intended to be a service, but could easily be called from a cron job or a simple systemd script to perform cyclic checks/downloads.
+I mainly use it from WSL, so I only start it by hand manually.
+
+The code is an iteration of link:url-feeddl[FeedDl^], which was heavily inspired by link:url-greg[greg^].
+Greg lacked flexible naming options and FeedDl had problems downloading feeds with invalid certificates and used link:url-stagger[stagger^] (like greg), which doesn't work with Python > 3.10 anymore.
+
+== License
+
+The repo is published under the *MIT license*.
+
+.Click to show the license
+[%collapsible]
+====
+include::LICENSE[]
+====
+
+== Installation
+
+:url-devcontainer: https://containers.dev
+:url-python-invoke: https://www.pyinvoke.org
+
+The repo provides a link:url-devcontainer[Development Containers^] configuration that sets up the necessary environment for development, but also works for running the application.
+
+A quicker solution would be to just install the necessary Python dependencies in a virtual environment.
+If you have link:url-python-invoke[Python Invoke^] installed, you may use this command to install dependencies:
+
+[source, bash]
+----
+invoke venv
+----
+
+If you don't have link:url-python-invoke[Invoke^] installed, you can install the `pip` dependencies manually (assuming you have `pip` and `venv` installed)
+
+[source, bash]
+----
+python3 -m venv venv
+pip install -r requirements.txt
+----
+
+== Configuration
+
+TODO
+
+== Usage
+
+TODO

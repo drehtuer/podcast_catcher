@@ -1,0 +1,4 @@
+# invoke configuration
+run:
+  # Print command to stdout
+  echo: true

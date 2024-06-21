@@ -1,0 +1,30 @@
+// http://containers.dev/
+{
+  "name": "podcast_catcher DevContainer",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "ARG_USER": "${localEnv:USER}"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "tamasfe.even-better-toml",
+        "dchanco.vsc-invoke",
+        "asciidoctor.asciidoctor-vscode"
+      ]
+    }
+  },
+  "mounts": [
+    // Make user settings available in container
+    "source=${localEnv:HOME}/.bashrc,target=${localEnv:HOME}/.bashrc,type=bind",
+    "source=${localEnv:HOME}/.gitconfig,target=${localEnv:HOME}/.gitconfig,type=bind",
+    "source=${localEnv:HOME}/.config,target=${localEnv:HOME}/.config,type=bind",
+    // Mount ssh keys (e.g. for github)
+    "source=${localEnv:HOME}/.ssh,target=${localEnv:HOME}/.ssh,type=bind",
+    // Mount current workspace
+    "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind,consistency=cached"
+  ]
+}
