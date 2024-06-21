@@ -8,10 +8,11 @@ in the same step.
 
 from invoke import context, task
 
-PYTHON_BIN='python3'
-PIP_BIN='pip'
-VENV_DIR='venv'
-REQUIREMENTS_TXT='requirements.txt'
+PYTHON_BIN = 'python3'
+
+DIST_DIR = 'dist'
+EGG_INFO_DIR = 'podcast_catcher.egg-info'
+
 
 def ctx_run(ctx: context, cmd: list[str]) -> None:
   """
@@ -23,8 +24,23 @@ def ctx_run(ctx: context, cmd: list[str]) -> None:
 
 
 @task
-def download(ctx: context) -> None:
-  cmd: list[str] = [
-    PYTHON_BIN,
+def build(ctx: context) -> None:
+  """
+  Build a python package.
+  """
+  cmd: list[str] = [PYTHON_BIN, '-m', 'build']
+  ctx_run(ctx, cmd)
 
+
+@task
+def clean(ctx: context) -> None:
+  """
+  Delete build results.
+  """
+  cmd: list[str] = [
+    'rm',
+    '-rf',
+    DIST_DIR,
+    EGG_INFO_DIR,
   ]
+  ctx_run(ctx, cmd)

@@ -1,0 +1,39 @@
+{
+  "download_dir": "/some folder",
+  "data-dir": "/another folder",
+  "aliases": {
+    "filename": "%Y%m%d",
+    "tag": ""
+  },
+  "feeds": [
+    {
+      "name": "feed name1",
+      "url": "https://example1.com/feed",
+      "download_dir": "myfeed",
+      "filename_pattern": "%date-filename% %title%%filename_ext%",
+      "tag": {
+        "title": "%title%",
+        "artist": "%author%",
+        "album": "%title",
+        "comment": "%summary%",
+        "date": "%date-tag%",
+        "genre": "podcast"
+      }
+    },
+    {
+      "name": "feed name2",
+      "url": "https://example2.com/rss",
+      "strict_https": false,
+      "download_dir": "my other feed",
+      "filename_pattern": "%date-filename% %title%%filename_ext%",
+      "tag": {
+        "title": "%title%",
+        "artist": "%author%",
+        "album": "%title",
+        "comment": "%summary%",
+        "date": "%date-tag%",
+        "genre": "podcast"
+      }
+    }
+  ]
+}

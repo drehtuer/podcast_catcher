@@ -1,0 +1,4 @@
+invoke==2.0.0
+eyed3==0.9.7
+feedparser==6.0.10
+requests==2.31.0

@@ -13,7 +13,7 @@
         "ms-python.python",
         "tamasfe.even-better-toml",
         "dchanco.vsc-invoke",
-        "asciidoctor.asciidoctor-vscode"
+        "charliermarsh.ruff"
       ]
     }
   },

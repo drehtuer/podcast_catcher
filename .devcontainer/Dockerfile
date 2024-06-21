@@ -3,7 +3,7 @@ FROM ubuntu:24.04
 
 LABEL name="Dev environment" \
   description="DevContainer for podcast_catcher" \
-  version="1.4"
+  version="1.5"
 
 ARG ARG_USER
 ARG ARG_USER_SHELL=/usr/bin/bash
@@ -42,13 +42,16 @@ RUN \
   # Python
   python3.12 \
   python-is-python3 \
-  # Python packages,
-  # no need for a virtual
-  # environment
-  python3-invoke \
-  python3-feedparser \
-  python3-requests \
+  # Python packages
+  python3-build \
+  python3-docutils \
   python3-eyed3 \
+  python3-feedparser \
+  python3-invoke \
+  python3-pygments \
+  python3-requests \
+  python3-setuptools \
+  python3-venv \
   # Set locale to us UTF-8
   && localedef \
   --inputfile=en_US \
