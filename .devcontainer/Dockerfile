@@ -3,7 +3,7 @@ FROM ubuntu:24.04
 
 LABEL name="Dev environment" \
   description="DevContainer for podcast_catcher" \
-  version="1.3"
+  version="1.4"
 
 ARG ARG_USER
 ARG ARG_USER_SHELL=/usr/bin/bash
@@ -40,15 +40,15 @@ RUN \
   # cause strange problems.
   locales \
   # Python
-  # invoke is installed
-  # via package manager to
-  # have it always available,
-  # event if venv is deleted.
   python3.12 \
   python-is-python3 \
+  # Python packages,
+  # no need for a virtual
+  # environment
   python3-invoke \
-  python3-pip \
-  python3-venv \
+  python3-feedparser \
+  python3-requests \
+  python3-eyed3 \
   # Set locale to us UTF-8
   && localedef \
   --inputfile=en_US \

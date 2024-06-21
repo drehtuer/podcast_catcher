@@ -33,20 +33,17 @@ include::LICENSE[]
 
 The repo provides a link:url-devcontainer[Development Containers^] configuration that sets up the necessary environment for development, but also works for running the application.
 
-A quicker solution would be to just install the necessary Python dependencies in a virtual environment.
-If you have link:url-python-invoke[Python Invoke^] installed, you may use this command to install dependencies:
+If you don't want to use the docker container, you may install the required packages locally.
+However, keep in mind that no guarantee is given that the versions available for your local installation are still compatible to the library.
 
 [source, bash]
 ----
-invoke venv
-----
-
-If you don't have link:url-python-invoke[Invoke^] installed, you can install the `pip` dependencies manually (assuming you have `pip` and `venv` installed)
-
-[source, bash]
-----
-python3 -m venv venv
-pip install -r requirements.txt
+sudo apt install \
+  --no-install-recommends \
+  python3-invoke \
+  python3-feedparser \
+  python3-requests \
+  python3-eyed3
 ----
 
 == Configuration

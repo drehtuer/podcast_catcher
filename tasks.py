@@ -21,34 +21,6 @@ def ctx_run(ctx: context, cmd: list[str]) -> None:
   """
   ctx.run(' '.join(cmd))
 
-@task
-def venv(ctx: context) -> None:
-  """
-  Setup venv.
-
-  Other virtual environment should
-  work as well, you should know how
-  to set them up in that case.
-
-  Running `invoke` requires either
-  installing the package from the
-  host's package manager or `pip`.
-  """
-  cmd: list[str] = [
-    PYTHON_BIN,
-    '-m',
-    'venv',
-    VENV_DIR
-  ]
-  ctx_run(ctx, cmd)
-
-  cmd = [
-    PIP_BIN,
-    'install',
-    '-r',
-    REQUIREMENTS_TXT
-  ]
-  ctx_run(ctx, cmd)
 
 @task
 def download(ctx: context) -> None:

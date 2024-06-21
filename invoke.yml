@@ -2,3 +2,5 @@
 run:
   # Print command to stdout
   echo: true
+  # Interactive terminal
+  pty: true
