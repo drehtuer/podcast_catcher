@@ -48,6 +48,7 @@ RUN \
   python3-eyed3 \
   python3-feedparser \
   python3-invoke \
+  python3-jsonschema \
   python3-pygments \
   python3-requests \
   python3-setuptools \

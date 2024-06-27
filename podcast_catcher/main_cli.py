@@ -16,7 +16,8 @@ from argparse import ArgumentParser
 from pathlib import Path
 from sys import exit
 
-from exceptions import PodcastCatcherError
+from config_factory import ConfigFactory
+from exception import PodcastCatcherError
 
 # Subparsers
 CMD_DOWNLOAD = 'download'
@@ -126,6 +127,11 @@ def main_cli() -> None:
   args = parser.parse_args()
 
   try:
+    config_factory = ConfigFactory(args.config)
+    config_factory.validate()
+    config = config_factory.create_config()
+    print(config)
+
     if args.cmd == CMD_DOWNLOAD:
       download(args.dry_run)
     elif args.cmd == CMD_LIST_FEEDS:

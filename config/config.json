@@ -1,39 +1,78 @@
 {
-  "download_dir": "/some folder",
-  "data-dir": "/another folder",
-  "aliases": {
-    "filename": "%Y%m%d",
-    "tag": ""
+  "settings": {
+    "download_dir": "/some folder",
+    "data_dir": "/another folder",
+    "mappings": [
+      {
+        "replace": "filename",
+        "with": "%Y%m%d"
+      },
+      {
+        "replace": "tag_title",
+        "with": "%title%"
+      },
+      {
+        "replace": "tag_artist",
+        "with": "%author%"
+      },
+      {
+        "replace": "tag_album",
+        "with": "%title"
+      },
+      {
+        "replace": "tag_comment",
+        "with": "%summary%"
+      },
+      {
+        "replace": "tag_date",
+        "with": "%date-tag%"
+      },
+      {
+        "replace": "tag_genre",
+        "with": "podcast"
+      }
+    ]
   },
   "feeds": [
     {
       "name": "feed name1",
-      "url": "https://example1.com/feed",
-      "download_dir": "myfeed",
-      "filename_pattern": "%date-filename% %title%%filename_ext%",
-      "tag": {
-        "title": "%title%",
-        "artist": "%author%",
-        "album": "%title",
-        "comment": "%summary%",
-        "date": "%date-tag%",
-        "genre": "podcast"
-      }
+      "url": "bob",
+      "download_subdir": "myfeed",
+      "mappings": [
+        {
+          "replace": "filename",
+          "with": "%date-filename% %title%%filename_ext%"
+        },
+        {
+          "replace": "tag_title",
+          "with": "%title%"
+        },
+        {
+          "replace": "tag_artist",
+          "with": "%author%"
+        },
+        {
+          "replace": "tag_album",
+          "with": "%title"
+        },
+        {
+          "replace": "tag_comment",
+          "with": "%summary%"
+        },
+        {
+          "replace": "tag_date",
+          "with": "%date-tag%"
+        },
+        {
+          "replace": "tag_genre",
+          "with": "podcast"
+        }
+      ]
     },
     {
       "name": "feed name2",
       "url": "https://example2.com/rss",
-      "strict_https": false,
-      "download_dir": "my other feed",
-      "filename_pattern": "%date-filename% %title%%filename_ext%",
-      "tag": {
-        "title": "%title%",
-        "artist": "%author%",
-        "album": "%title",
-        "comment": "%summary%",
-        "date": "%date-tag%",
-        "genre": "podcast"
-      }
+      "strict_https": false
     }
   ]
 }

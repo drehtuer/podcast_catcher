@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "podcast_catcher configuration file schema",
+  "description": "JSON Schema for podcast_catcher configuration file",
+  "type": "object",
+  "properties": {
+    "settings": {
+      "type": "object",
+      "properties": {
+        "download_dir": {
+          "$ref": "#/$defs/local_folder"
+        },
+        "data_dir": {
+          "$ref": "#/$defs/local_folder"
+        },
+        "mappings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/mapping"
+          }
+        }
+      },
+      "required": [
+        "download_dir",
+        "data_dir"
+      ]
+    },
+    "feeds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "$ref": "#/$defs/internet_address"
+          },
+          "strict_https": {
+            "type": "boolean",
+            "default": "True"
+          },
+          "download_subdir": {
+            "$ref": "#/$defs/local_folder"
+          },
+          "skip_older_than": {
+            "$ref": "#/$defs/date_time"
+          },
+          "mappings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/mapping"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "url"
+        ]
+      }
+    }
+  },
+  "required": [
+    "settings",
+    "feeds"
+  ],
+  "$defs": {
+    "local_folder": {
+      "type": "string"
+    },
+    "internet_address": {
+      "type": "string",
+      "format": "uri"
+    },
+    "date_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "mapping": {
+      "type": "object",
+      "properties": {
+        "replace": {
+          "type": "string"
+        },
+        "with": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "replace",
+        "with"
+      ]
+    }
+  }
+}
