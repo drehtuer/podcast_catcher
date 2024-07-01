@@ -1,5 +1,5 @@
 """
-Exception class for podcast_catcher.
+Exception class(es) for podcast_catcher.
 """
 
 

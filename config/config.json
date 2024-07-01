@@ -35,9 +35,8 @@
   },
   "feeds": [
     {
-      "name": "feed name1",
-      "url": "bob",
-      "download_subdir": "myfeed",
+      "name": "Pseudopod",
+      "url": "https://pseudopod.org/feed/podcast/",
       "mappings": [
         {
           "replace": "filename",
@@ -68,11 +67,6 @@
           "with": "podcast"
         }
       ]
-    },
-    {
-      "name": "feed name2",
-      "url": "https://example2.com/rss",
-      "strict_https": false
     }
   ]
 }

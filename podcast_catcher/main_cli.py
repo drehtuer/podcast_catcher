@@ -16,8 +16,13 @@ from argparse import ArgumentParser
 from pathlib import Path
 from sys import exit
 
-from config_factory import ConfigFactory
+from config_json_factory import ConfigJsonFactory
 from exception import PodcastCatcherError
+from feed import Feed
+from http_loader import HttpLoader
+from version import VERSION
+
+from config import Config
 
 # Subparsers
 CMD_DOWNLOAD = 'download'
@@ -96,24 +101,31 @@ def build_argument_parser() -> ArgumentParser:
   return parser
 
 
-def download(dry_run: bool) -> None:
+def download(config: Config, dry_run: bool) -> None:
   pass
 
 
-def list_feeds() -> None:
+def list_feeds(config: Config) -> None:
+  loader = HttpLoader()
+  feed = Feed()
+  for f in config.feeds():
+    text = loader.get_feed(f.url())
+    feed.parse(text)
+
+
+def list_episodes(config: Config) -> None:
   pass
 
 
-def list_episodes() -> None:
-  pass
-
-
-def raw_feed() -> None:
+def raw_feed(config: Config) -> None:
   pass
 
 
 def version() -> None:
-  pass
+  """
+  Show applicaton version.
+  """
+  print('.'.join([str(v) for v in VERSION]))
 
 
 def main_cli() -> None:
@@ -126,22 +138,23 @@ def main_cli() -> None:
   parser: ArgumentParser = build_argument_parser()
   args = parser.parse_args()
 
+  if args.cmd == CMD_VERSION:
+    version()
+    exit(EXIT_SUCCESS)
+
   try:
-    config_factory = ConfigFactory(args.config)
-    config_factory.validate()
-    config = config_factory.create_config()
-    print(config)
+    config_json_factory = ConfigJsonFactory(args.config)
+    config_json_factory.validate()
+    config = config_json_factory.create_config()
 
     if args.cmd == CMD_DOWNLOAD:
-      download(args.dry_run)
+      download(config, dry_run=args.dry_run)
     elif args.cmd == CMD_LIST_FEEDS:
-      list_feeds()
+      list_feeds(config)
     elif args.cmd == CMD_LIST_EPISODES:
-      list_episodes()
+      list_episodes(config)
     elif args.cmd == CMD_RAW_FEED:
-      raw_feed()
-    elif args.cmd == CMD_VERSION:
-      version()
+      raw_feed(config)
     else:
       print(f"Unknown argument '{args.cmd}'")
       exit(EXIT_ERROR)

@@ -13,7 +13,7 @@ from jsonschema import Draft202012Validator, SchemaError, ValidationError, valid
 from config import Config
 
 
-class ConfigFactory:
+class ConfigJsonFactory:
   """
   Loader and validator
   for JSON config files.
@@ -108,7 +108,7 @@ class ConfigFactory:
         feed = Config.Feed(
           name=entry[self.KEY_NAME],
           url=entry[self.KEY_URL],
-          strict_https=self.__get_optional(entry, self.KEY_STRICT_HTTPS, None),
+          strict_https=self.__get_optional(entry, self.KEY_STRICT_HTTPS, False),
           download_subdir=self.__get_optional(entry, self.KEY_DOWNLOAD_SUBDIR, None),
           skip_older_than=self.__get_optional(
             entry, self.KEY_SKIP_ODER_THAN, None, func=datetime.fromisoformat
