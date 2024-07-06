@@ -5,31 +5,27 @@
     "mappings": [
       {
         "replace": "filename",
-        "with": "%Y%m%d"
+        "with": "%episode_date%-%episode_url_basename%%episode_url_extension%"
       },
       {
         "replace": "tag_title",
-        "with": "%title%"
+        "with": "%episode_title%"
       },
       {
         "replace": "tag_artist",
-        "with": "%author%"
+        "with": "%config_name%"
       },
       {
         "replace": "tag_album",
-        "with": "%title"
+        "with": "%feed_title%"
       },
       {
-        "replace": "tag_comment",
-        "with": "%summary%"
+        "replace": "tag_summary",
+        "with": "%episode_summary%"
       },
       {
         "replace": "tag_date",
-        "with": "%date-tag%"
-      },
-      {
-        "replace": "tag_genre",
-        "with": "podcast"
+        "with": "%episode_date%"
       }
     ]
   },
@@ -40,7 +36,7 @@
       "mappings": [
         {
           "replace": "filename",
-          "with": "%date-filename% %title%%filename_ext%"
+          "with": "%episode_date%-%episode_url_basename%%episode_url_extension%"
         },
         {
           "replace": "tag_title",
@@ -48,11 +44,11 @@
         },
         {
           "replace": "tag_artist",
-          "with": "%author%"
+          "with": "%artist%"
         },
         {
           "replace": "tag_album",
-          "with": "%title"
+          "with": "%album%"
         },
         {
           "replace": "tag_comment",
@@ -60,11 +56,7 @@
         },
         {
           "replace": "tag_date",
-          "with": "%date-tag%"
-        },
-        {
-          "replace": "tag_genre",
-          "with": "podcast"
+          "with": "%date%"
         }
       ]
     }

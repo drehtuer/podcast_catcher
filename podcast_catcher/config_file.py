@@ -5,7 +5,7 @@ Read configuration from a JSON file.
 from datetime import datetime
 
 
-class Config:
+class ConfigFile:
   """
   Providing configuration for the application.
   """
@@ -76,7 +76,6 @@ class Config:
         self.__download_subdir = download_subdir
       else:
         self.__download_subdir = name
-      self.__download_subdir = download_subdir
       self.__skip_older_than = skip_older_than
       self.__mappings = mappings
 
@@ -157,8 +156,8 @@ class Config:
     global mappings.
     Throws KeyError is mapping_key is in neither dict.
     """
-    if mapping_key in feed.mappings:
-      return feed.mappings[mapping_key]
+    if mapping_key in feed.mappings():
+      return feed.mappings()[mapping_key]
     return self.settings().mappings()[mapping_key]
 
   def __repr__(self) -> str:

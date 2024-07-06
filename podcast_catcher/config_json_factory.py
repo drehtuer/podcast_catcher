@@ -7,10 +7,9 @@ from datetime import datetime
 from json import JSONDecodeError, loads
 from pathlib import Path
 
+from config_file import ConfigFile
 from exception import PodcastCatcherError
 from jsonschema import Draft202012Validator, SchemaError, ValidationError, validate
-
-from config import Config
 
 
 class ConfigJsonFactory:
@@ -82,7 +81,7 @@ class ConfigJsonFactory:
       return data[key]
     return default
 
-  def create_config(self) -> Config:
+  def create_config(self) -> ConfigFile:
     """
     Create Config instance from
     loaded JSON config.
@@ -92,7 +91,7 @@ class ConfigJsonFactory:
       for entry in self.__config_data[self.KEY_SETTINGS][self.KEY_MAPPINGS]:
         settings_mappings[entry[self.KEY_REPLACE]] = entry[self.KEY_WITH]
 
-    settings = Config.Settings(
+    settings = ConfigFile.Settings(
       download_dir=self.__config_data[self.KEY_SETTINGS][self.KEY_DOWNLOAD_DIR],
       data_dir=self.__config_data[self.KEY_SETTINGS][self.KEY_DATA_DIR],
       mappings=settings_mappings,
@@ -105,10 +104,10 @@ class ConfigJsonFactory:
           for sub_entry in entry[self.KEY_MAPPINGS]:
             feed_mappings[sub_entry[self.KEY_REPLACE]] = sub_entry[self.KEY_WITH]
 
-        feed = Config.Feed(
+        feed = ConfigFile.Feed(
           name=entry[self.KEY_NAME],
           url=entry[self.KEY_URL],
-          strict_https=self.__get_optional(entry, self.KEY_STRICT_HTTPS, False),
+          strict_https=self.__get_optional(entry, self.KEY_STRICT_HTTPS, True),
           download_subdir=self.__get_optional(entry, self.KEY_DOWNLOAD_SUBDIR, None),
           skip_older_than=self.__get_optional(
             entry, self.KEY_SKIP_ODER_THAN, None, func=datetime.fromisoformat
@@ -117,4 +116,4 @@ class ConfigJsonFactory:
         )
         feeds.append(feed)
 
-    return Config(settings, feeds)
+    return ConfigFile(settings, feeds)

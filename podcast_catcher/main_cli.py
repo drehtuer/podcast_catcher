@@ -16,13 +16,13 @@ from argparse import ArgumentParser
 from pathlib import Path
 from sys import exit
 
+from config_file import ConfigFile
 from config_json_factory import ConfigJsonFactory
 from exception import PodcastCatcherError
 from feed import Feed
 from http_loader import HttpLoader
+from replacer import Replacer
 from version import VERSION
-
-from config import Config
 
 # Subparsers
 CMD_DOWNLOAD = 'download'
@@ -39,9 +39,9 @@ SUB_CMDS = [
   CMD_VERSION,
 ]
 
-DEFAULT_CONFIG = str(
-  Path.joinpath(Path.home(), '.config', 'podcast_catcher', 'config.json')
-)
+DEFAULT_CONFIG = str(Path.home().joinpath('.config', 'podcast_catcher', 'config.json'))
+
+MAPPING_FILENAME = 'filename'
 
 EXIT_SUCCESS = 0
 EXIT_ERROR = 2
@@ -86,12 +86,22 @@ def build_argument_parser() -> ArgumentParser:
     CMD_LIST_FEEDS,
   )
 
-  sub_parsers.add_parser(
+  parser_list_episodes = sub_parsers.add_parser(
     CMD_LIST_EPISODES,
   )
+  parser_list_episodes.add_argument(
+    'feed_name',
+    type=str,
+    help='Name of the feed',
+  )
 
-  sub_parsers.add_parser(
+  parser_raw_feed = sub_parsers.add_parser(
     CMD_RAW_FEED,
+  )
+  parser_raw_feed.add_argument(
+    'feed_name',
+    type=str,
+    help='Name of the feed',
   )
 
   sub_parsers.add_parser(
@@ -101,24 +111,90 @@ def build_argument_parser() -> ArgumentParser:
   return parser
 
 
-def download(config: Config, dry_run: bool) -> None:
-  pass
-
-
-def list_feeds(config: Config) -> None:
+def download(config: ConfigFile, dry_run: bool) -> None:
+  """
+  Download feed enclosures not
+  downloaded, yet.
+  """
   loader = HttpLoader()
-  feed = Feed()
-  for f in config.feeds():
-    text = loader.get_feed(f.url())
-    feed.parse(text)
+  replacer = Replacer()
+  download_dir = Path(config.settings().download_dir())
+  if not download_dir.exists():
+    download_dir.mkdir(parents=True)
+  for config_feed in config.feeds():
+    replacer.update_name(config_feed.name())
+    feed_text = loader.get_feed(
+      url=config_feed.url(),
+      verify_https=config_feed.is_strict_https(),
+    )
+    parsed_feed = Feed(feed_text=feed_text)
+    replacer.update_feed(parsed_feed)
+    target_dir = download_dir.joinpath(
+      Path(config_feed.download_subdir()),
+    )
+    if not target_dir.exists():
+      target_dir.mkdir(parents=True)
+
+    entries = parsed_feed.entries()
+    print(f'{config_feed.name()} ({len(entries)} new entries)')
+    index = 1
+    for entry in entries:
+      replacer.update_entry(entry)
+      filename = replacer.replace(
+        config.get_mapping(
+          config_feed,
+          MAPPING_FILENAME,
+        )
+      )
+      print(f'\t{index}/{len(entries)}: {entry.title()} ... ', end='')
+      loader.download(
+        source=entry.enclosure(),
+        target=target_dir.joinpath(
+          Path(f'{filename}'),
+        ),
+        verify_https=config_feed.is_strict_https(),
+      )
+      print('Done')
+      index += 1
 
 
-def list_episodes(config: Config) -> None:
-  pass
+def list_feeds(config: ConfigFile) -> None:
+  """
+  Show a list of feeds in config.
+  """
+  for feed in config.feeds():
+    print(f'{feed.name()} ({feed.url()})')
+    print('\tLast download: ')
 
 
-def raw_feed(config: Config) -> None:
-  pass
+def list_episodes(config: ConfigFile, feed_name: str) -> None:
+  """
+  Name of the feed to show
+  (available) episodes for.
+  """
+  loader = HttpLoader()
+  for config_feed in config.feeds():
+    if config_feed.name() == feed_name:
+      print(f'{config_feed.name()}')
+      feed_text = loader.get_feed(
+        url=config_feed.url(),
+        verify_https=config_feed.is_strict_https(),
+      )
+      parsed_feed = Feed(feed_text=feed_text)
+      for entry in parsed_feed.entries():
+        print(f"\t'{entry.title()}' ({entry.link()}) from {entry.published()}")
+
+
+def raw_feed(config: ConfigFile, feed_name: str) -> None:
+  """
+  Show raw RSS/ATOM feed
+  fetched via HTTP(S).
+  """
+  loader = HttpLoader()
+  for feed in config.feeds():
+    if feed.name() == feed_name:
+      feed_text = loader.get_feed(feed.url())
+      print(feed_text)
 
 
 def version() -> None:
@@ -148,13 +224,22 @@ def main_cli() -> None:
     config = config_json_factory.create_config()
 
     if args.cmd == CMD_DOWNLOAD:
-      download(config, dry_run=args.dry_run)
+      download(
+        config,
+        dry_run=args.dry_run,
+      )
     elif args.cmd == CMD_LIST_FEEDS:
       list_feeds(config)
     elif args.cmd == CMD_LIST_EPISODES:
-      list_episodes(config)
+      list_episodes(
+        config,
+        args.feed_name,
+      )
     elif args.cmd == CMD_RAW_FEED:
-      raw_feed(config)
+      raw_feed(
+        config,
+        args.feed_name,
+      )
     else:
       print(f"Unknown argument '{args.cmd}'")
       exit(EXIT_ERROR)
