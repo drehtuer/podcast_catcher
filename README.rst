@@ -13,7 +13,7 @@ It's not intended to be a service, but could easily be called from a cron job or
 I mainly use it from WSL, so I only start it by hand manually.
 
 The code is an iteration of `FeedDl`_, which was heavily inspired by `greg`_.
-Greg lacked flexible naming options and FeedDl had problems downloading feeds with invalid certificates and used `stagger`_ (like greg), which doesn't work with Python > 3.10 anymore.
+Greg lacked flexible naming options and FeedDl had problems downloading feeds with invalid certificates and used `stagger`_ (like greg), which doesn't work with Python > 3.9 anymore.
 
 
 License

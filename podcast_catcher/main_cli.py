@@ -18,6 +18,7 @@ from sys import exit
 
 from config_file import ConfigFile
 from config_json_factory import ConfigJsonFactory
+from episode_tracker import EpisodeTracker
 from exception import PodcastCatcherError
 from feed import Feed
 from http_loader import HttpLoader
@@ -122,40 +123,60 @@ def download(config: ConfigFile, dry_run: bool) -> None:
   if not download_dir.exists():
     download_dir.mkdir(parents=True)
   for config_feed in config.feeds():
+    episode_tracker = EpisodeTracker(config, config_feed.name())
+
     replacer.update_name(config_feed.name())
     feed_text = loader.get_feed(
       url=config_feed.url(),
       verify_https=config_feed.is_strict_https(),
     )
+
     parsed_feed = Feed(feed_text=feed_text)
+
     replacer.update_feed(parsed_feed)
+
     target_dir = download_dir.joinpath(
       Path(config_feed.download_subdir()),
     )
     if not target_dir.exists():
       target_dir.mkdir(parents=True)
 
-    entries = parsed_feed.entries()
+    already_downloaded = episode_tracker.already_downloaded_links()
+    entries = [
+      entry
+      for entry in parsed_feed.entries()
+      if entry.enclosure() not in already_downloaded
+    ]
+    # Sort entries from oldest to newest
+    entries.sort(key=lambda e: e.published())
     print(f'{config_feed.name()} ({len(entries)} new entries)')
     index = 1
-    for entry in entries:
-      replacer.update_entry(entry)
-      filename = replacer.replace(
-        config.get_mapping(
-          config_feed,
-          MAPPING_FILENAME,
+    try:
+      for entry in entries:
+        replacer.update_entry(entry)
+        filename = replacer.replace(
+          config.get_mapping(
+            config_feed,
+            MAPPING_FILENAME,
+          )
         )
-      )
-      print(f'\t{index}/{len(entries)}: {entry.title()} ... ', end='')
-      loader.download(
-        source=entry.enclosure(),
-        target=target_dir.joinpath(
-          Path(f'{filename}'),
-        ),
-        verify_https=config_feed.is_strict_https(),
-      )
-      print('Done')
-      index += 1
+        print(
+          f'\t{index}/{len(entries)}: {entry.title()} ... ',
+          end='',
+          flush=True,
+        )
+        loader.download(
+          source=entry.enclosure(),
+          target=target_dir.joinpath(
+            Path(f'{filename}'),
+          ),
+          verify_https=config_feed.is_strict_https(),
+        )
+        episode_tracker.complete(entry)
+        print('Done')
+        index += 1
+    finally:
+      episode_tracker.save()
 
 
 def list_feeds(config: ConfigFile) -> None:
@@ -175,13 +196,22 @@ def list_episodes(config: ConfigFile, feed_name: str) -> None:
   loader = HttpLoader()
   for config_feed in config.feeds():
     if config_feed.name() == feed_name:
+      episode_tracker = EpisodeTracker(config, config_feed.name())
       print(f'{config_feed.name()}')
       feed_text = loader.get_feed(
         url=config_feed.url(),
         verify_https=config_feed.is_strict_https(),
       )
       parsed_feed = Feed(feed_text=feed_text)
-      for entry in parsed_feed.entries():
+      # Sort entries from oldest to newest
+      already_downloaded = episode_tracker.already_downloaded_links()
+      entries = [
+        entry
+        for entry in parsed_feed.entries()
+        if entry.enclosure() not in already_downloaded
+      ]
+      entries.sort(key=lambda e: e.published())
+      for entry in entries:
         print(f"\t'{entry.title()}' ({entry.link()}) from {entry.published()}")
 
 
