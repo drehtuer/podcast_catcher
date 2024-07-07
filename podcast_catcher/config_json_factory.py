@@ -3,7 +3,7 @@ Create a config instance
 by loading a JSON file.
 """
 
-from datetime import datetime
+from datetime import UTC, datetime
 from json import JSONDecodeError, loads
 from pathlib import Path
 
@@ -83,6 +83,13 @@ class ConfigJsonFactory:
       return data[key]
     return default
 
+  @staticmethod
+  def __parse_datetime(text: str) -> datetime:
+    """
+    Format string to datetime.
+    """
+    return datetime.strptime(text, '%Y-%m-%d').astimezone(tz=UTC)
+
   def create_config(self) -> ConfigFile:
     """
     Create Config instance from
@@ -114,7 +121,7 @@ class ConfigJsonFactory:
           enabled=self.__get_optional(entry, self.KEY_ENABLED, True),
           download_subdir=self.__get_optional(entry, self.KEY_DOWNLOAD_SUBDIR, None),
           skip_older_than=self.__get_optional(
-            entry, self.KEY_SKIP_ODER_THAN, None, func=datetime.fromisoformat
+            entry, self.KEY_SKIP_ODER_THAN, None, func=self.__parse_datetime
           ),
           filename=self.__get_optional(entry, self.KEY_FILENAME, None),
           tags=feed_tags,

@@ -74,7 +74,7 @@ class ConfigFile:
       strict_https: bool,
       enabled: bool,
       download_subdir: str | None,
-      skip_older_than: datetime,
+      skip_older_than: datetime | None,
       filename: str | None,
       tags: dict[str, str],
     ):
@@ -117,7 +117,7 @@ class ConfigFile:
       """
       return self.__enabled
 
-    def skip_older_than(self) -> datetime:
+    def skip_older_than(self) -> datetime | None:
       """
       Return reference to skip_older_than.
       """

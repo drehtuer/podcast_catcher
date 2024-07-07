@@ -146,6 +146,10 @@ def download(config: ConfigFile) -> None:
       for entry in parsed_feed.entries()
       if entry.enclosure() not in already_downloaded
     ]
+    if config_feed.skip_older_than() is not None:
+      entries = [
+        entry for entry in entries if entry.published() >= config_feed.skip_older_than()
+      ]
     # Sort entries from oldest to newest
     entries.sort(key=lambda e: e.published())
     print(f'{config_feed.name()} ({len(entries)} new entries)')
@@ -220,6 +224,12 @@ def list_episodes(config: ConfigFile, feed_name: str) -> None:
         for entry in parsed_feed.entries()
         if entry.enclosure() not in already_downloaded
       ]
+      if config_feed.skip_older_than() is not None:
+        entries = [
+          entry
+          for entry in entries
+          if entry.published() >= config_feed.skip_older_than()
+        ]
       entries.sort(key=lambda e: e.published())
       for entry in entries:
         print(f"\t'{entry.title()}' ({entry.link()}) from {entry.published()}")
