@@ -160,7 +160,7 @@ def download(config: ConfigFile) -> None:
         replacer.update_entry(entry)
         filename = replacer.replace(config.get_filename(feed=config_feed))
         print(
-          f'\t{index}/{len(entries)}: {entry.title()} ... ',
+          f'\t{index}/{len(entries)}: {entry.title()} ({entry.published()})... ',
           end='',
           flush=True,
         )
