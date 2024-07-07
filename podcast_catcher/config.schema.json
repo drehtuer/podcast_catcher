@@ -13,7 +13,10 @@
         "data_dir": {
           "$ref": "#/$defs/local_folder"
         },
-        "mappings": {
+        "filename": {
+          "$ref": "#/$defs/replacable_text"
+        },
+        "tags": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/mapping"
@@ -22,7 +25,8 @@
       },
       "required": [
         "download_dir",
-        "data_dir"
+        "data_dir",
+        "filename"
       ]
     },
     "feeds": {
@@ -40,13 +44,20 @@
             "type": "boolean",
             "default": "True"
           },
+          "enabled": {
+            "type": "boolean",
+            "default": "True"
+          },
           "download_subdir": {
             "$ref": "#/$defs/local_folder"
           },
           "skip_older_than": {
             "$ref": "#/$defs/date_time"
           },
-          "mappings": {
+          "filename": {
+            "$ref": "#/$defs/replacable_text"
+          },
+          "tags": {
             "type": "array",
             "items": {
               "$ref": "#/$defs/mapping"
@@ -72,6 +83,9 @@
       "type": "string",
       "format": "uri"
     },
+    "replacable_text": {
+      "type": "string"
+    },
     "date_time": {
       "type": "string",
       "format": "date-time"
@@ -83,7 +97,7 @@
           "type": "string"
         },
         "with": {
-          "type": "string"
+          "$ref": "#/$defs/replacable_text"
         }
       },
       "required": [

@@ -22,6 +22,7 @@ from episode_tracker import EpisodeTracker
 from exception import PodcastCatcherError
 from feed import Feed
 from http_loader import HttpLoader
+from id3tagger import ID3Tagger
 from replacer import Replacer
 from version import VERSION
 
@@ -74,13 +75,8 @@ def build_argument_parser() -> ArgumentParser:
     metavar=f'{{{','.join(SUB_CMDS)}}}',
   )
 
-  parser_download = sub_parsers.add_parser(
+  sub_parsers.add_parser(
     CMD_DOWNLOAD,
-  )
-  parser_download.add_argument(
-    '--dry-run',
-    action='store_true',
-    help="Check for updates, but don't download any files",
   )
 
   sub_parsers.add_parser(
@@ -112,7 +108,7 @@ def build_argument_parser() -> ArgumentParser:
   return parser
 
 
-def download(config: ConfigFile, dry_run: bool) -> None:
+def download(config: ConfigFile) -> None:
   """
   Download feed enclosures not
   downloaded, yet.
@@ -123,6 +119,9 @@ def download(config: ConfigFile, dry_run: bool) -> None:
   if not download_dir.exists():
     download_dir.mkdir(parents=True)
   for config_feed in config.feeds():
+    # Skip feeds not enabled
+    if not config_feed.is_enabled:
+      continue
     episode_tracker = EpisodeTracker(config, config_feed.name())
 
     replacer.update_name(config_feed.name())
@@ -151,31 +150,38 @@ def download(config: ConfigFile, dry_run: bool) -> None:
     entries.sort(key=lambda e: e.published())
     print(f'{config_feed.name()} ({len(entries)} new entries)')
     index = 1
+    tags = config.get_tags(config_feed)
     try:
       for entry in entries:
         replacer.update_entry(entry)
-        filename = replacer.replace(
-          config.get_mapping(
-            config_feed,
-            MAPPING_FILENAME,
-          )
-        )
+        filename = replacer.replace(config.get_filename(feed=config_feed))
         print(
           f'\t{index}/{len(entries)}: {entry.title()} ... ',
           end='',
           flush=True,
         )
+        target_file = target_dir.joinpath(Path(f'{filename}'))
         loader.download(
           source=entry.enclosure(),
-          target=target_dir.joinpath(
-            Path(f'{filename}'),
-          ),
+          target=target_file,
           verify_https=config_feed.is_strict_https(),
         )
+        tagger = ID3Tagger(target_file)
+        for key, value in tags.items():
+          tagger.set(key, replacer.replace(value))
+        tagger.set('genre', ', '.join(entry.tags()))
+        tagger.save()
         episode_tracker.complete(entry)
         print('Done')
         index += 1
+    except InterruptedError:
+      # Silently abort via CRTL-C
+      # (no stack trace).
+      pass
+    except Exception as e:
+      raise e
     finally:
+      # Ensure the tracker is saved at the end
       episode_tracker.save()
 
 
@@ -184,8 +190,12 @@ def list_feeds(config: ConfigFile) -> None:
   Show a list of feeds in config.
   """
   for feed in config.feeds():
-    print(f'{feed.name()} ({feed.url()})')
-    print('\tLast download: ')
+    print(f'{feed.name()} ({feed.url()}) (enabled: {feed.is_enabled()})')
+    episode_tracker = EpisodeTracker(config, feed.name())
+    last_entry = episode_tracker.latest_entry()
+    if last_entry is None:
+      last_entry = '-'
+    print(f'\tLast download: {last_entry}')
 
 
 def list_episodes(config: ConfigFile, feed_name: str) -> None:
@@ -256,7 +266,6 @@ def main_cli() -> None:
     if args.cmd == CMD_DOWNLOAD:
       download(
         config,
-        dry_run=args.dry_run,
       )
     elif args.cmd == CMD_LIST_FEEDS:
       list_feeds(config)

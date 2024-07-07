@@ -23,7 +23,8 @@ class ConfigJsonFactory:
   KEY_SETTINGS = 'settings'
   KEY_DOWNLOAD_DIR = 'download_dir'
   KEY_DATA_DIR = 'data_dir'
-  KEY_MAPPINGS = 'mappings'
+  KEY_FILENAME = 'filename'
+  KEY_TAGS = 'tags'
 
   KEY_REPLACE = 'replace'
   KEY_WITH = 'with'
@@ -32,6 +33,7 @@ class ConfigJsonFactory:
   KEY_NAME = 'name'
   KEY_URL = 'url'
   KEY_STRICT_HTTPS = 'strict_https'
+  KEY_ENABLED = 'enabled'
   KEY_SKIP_ODER_THAN = 'skip_older_than'
   KEY_DOWNLOAD_SUBDIR = 'download_subdir'
 
@@ -86,33 +88,36 @@ class ConfigJsonFactory:
     Create Config instance from
     loaded JSON config.
     """
-    settings_mappings = {}
-    if self.KEY_MAPPINGS in self.__config_data[self.KEY_SETTINGS]:
-      for entry in self.__config_data[self.KEY_SETTINGS][self.KEY_MAPPINGS]:
-        settings_mappings[entry[self.KEY_REPLACE]] = entry[self.KEY_WITH]
+    settings_tags = {}
+    if self.KEY_TAGS in self.__config_data[self.KEY_SETTINGS]:
+      for entry in self.__config_data[self.KEY_SETTINGS][self.KEY_TAGS]:
+        settings_tags[entry[self.KEY_REPLACE]] = entry[self.KEY_WITH]
 
     settings = ConfigFile.Settings(
       download_dir=self.__config_data[self.KEY_SETTINGS][self.KEY_DOWNLOAD_DIR],
       data_dir=self.__config_data[self.KEY_SETTINGS][self.KEY_DATA_DIR],
-      mappings=settings_mappings,
+      filename=self.__config_data[self.KEY_SETTINGS][self.KEY_FILENAME],
+      tags=settings_tags,
     )
     feeds = []
     if self.KEY_FEEDS in self.__config_data:
       for entry in self.__config_data[self.KEY_FEEDS]:
-        feed_mappings = {}
-        if self.KEY_MAPPINGS in entry:
-          for sub_entry in entry[self.KEY_MAPPINGS]:
-            feed_mappings[sub_entry[self.KEY_REPLACE]] = sub_entry[self.KEY_WITH]
+        feed_tags = {}
+        if self.KEY_TAGS in entry:
+          for sub_entry in entry[self.KEY_TAGS]:
+            feed_tags[sub_entry[self.KEY_REPLACE]] = sub_entry[self.KEY_WITH]
 
         feed = ConfigFile.Feed(
           name=entry[self.KEY_NAME],
           url=entry[self.KEY_URL],
           strict_https=self.__get_optional(entry, self.KEY_STRICT_HTTPS, True),
+          enabled=self.__get_optional(entry, self.KEY_ENABLED, True),
           download_subdir=self.__get_optional(entry, self.KEY_DOWNLOAD_SUBDIR, None),
           skip_older_than=self.__get_optional(
             entry, self.KEY_SKIP_ODER_THAN, None, func=datetime.fromisoformat
           ),
-          mappings=feed_mappings,
+          filename=self.__get_optional(entry, self.KEY_FILENAME, None),
+          tags=feed_tags,
         )
         feeds.append(feed)
 

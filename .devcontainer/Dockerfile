@@ -45,7 +45,7 @@ RUN \
   # Python packages
   python3-build \
   python3-docutils \
-  python3-eyed3 \
+  python3-mutagen \
   python3-feedparser \
   python3-invoke \
   python3-jsonschema \

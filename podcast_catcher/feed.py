@@ -16,6 +16,7 @@ class Entry:
 
   def __init__(
     self,
+    author: str,
     enclosure: str,
     link: str,
     published: datetime,
@@ -26,12 +27,19 @@ class Entry:
     """
     CTOR for entry element.
     """
+    self.__author = author
     self.__enclosure = enclosure
     self.__link = link
     self.__published = published
     self.__summary = summary
     self.__title = title
     self.__tags = tags
+
+  def author(self) -> str:
+    """
+    Return author of the entry.
+    """
+    return self.__author
 
   def enclosure(self) -> str:
     """
@@ -77,6 +85,7 @@ class Entry:
     of the entry instance.
     """
     items = [
+      f"author: '{self.author()}'",
       f"title: '{self.title()}'",
       f"published: '{self.published()}'",
       f"enclosure: '{self.enclosure()}'",
@@ -93,7 +102,9 @@ class Feed:
   """
 
   TAG_TERM_KEY = 'term'
+  TAG_TAGS = 'tags'
   TAG_UPDATED_PARSED = 'updated_parsed'
+  TAG_PUBLISHED_PARSED = 'published_parsed'
 
   def __init__(self, feed_text: str):
     """
@@ -113,11 +124,14 @@ class Feed:
         timestamp=mktime(parsed.feed.updated_parsed),
         tz=UTC,
       )
-    else:
+    elif self.TAG_PUBLISHED_PARSED in parsed.feed:
       self.__updated = datetime.fromtimestamp(
         timestamp=mktime(parsed.feed.published_parsed),
         tz=UTC,
       )
+    else:
+      # TODO: Better solution?
+      self.__updated = datetime.now(tz=UTC)
 
     self.__entries: list[str] = []
     for entry in parsed.entries:
@@ -132,8 +146,12 @@ class Feed:
       if len(entry.enclosures) > 1:
         # TODO: Support preferred enclosure format
         print(f"Feed '{self.title()}' supports multiple encosure options", file=stderr)
+      tags = []
+      if self.TAG_TAGS in entry:
+        tags = [term[self.TAG_TERM_KEY] for term in entry.tags]
       self.__entries.append(
         Entry(
+          author=entry.author,
           enclosure=enclosure,
           published=datetime.fromtimestamp(
             timestamp=mktime(entry.published_parsed),
@@ -141,7 +159,7 @@ class Feed:
           ),
           summary=entry.summary,
           # tag scheme and label are ignored
-          tags=[term[self.TAG_TERM_KEY] for term in entry.tags],
+          tags=tags,
           title=entry.title,
           link=entry.link,
         )

@@ -68,3 +68,16 @@ class EpisodeTracker:
     List of already downloaded episodes (URL links).
     """
     return [x[self.EPISODE_URL] for x in self.__completed_downloads]
+
+  def latest_entry(self) -> str | None:
+    """
+    Get latest published and downloaded entry.
+    """
+    if len(self.__completed_downloads) > 0:
+      sorted_list = sorted(
+        self.__completed_downloads,
+        key=lambda e: e[self.EPISODE_PUBLISHED],
+      )
+      # Return last entry, which is the newest entry.
+      return sorted_list[-1]
+    return None

@@ -1,64 +1,35 @@
 {
   "settings": {
-    "download_dir": "/some folder",
-    "data_dir": "/another folder",
-    "mappings": [
+    "download_dir": "/some folder/",
+    "data_dir": "/some other folder/.data",
+    "filename": "%episode_date%-%episode_url_basename%%episode_url_extension%",
+    "tags": [
       {
-        "replace": "filename",
-        "with": "%episode_date%-%episode_url_basename%%episode_url_extension%"
-      },
-      {
-        "replace": "tag_title",
+        "replace": "title",
         "with": "%episode_title%"
       },
       {
-        "replace": "tag_artist",
-        "with": "%config_name%"
+        "replace": "artist",
+        "with": "%episode_author%"
       },
       {
-        "replace": "tag_album",
+        "replace": "album",
         "with": "%feed_title%"
       },
       {
-        "replace": "tag_summary",
-        "with": "%episode_summary%"
+        "replace": "date",
+        "with": "%episode_date%"
       },
       {
-        "replace": "tag_date",
-        "with": "%episode_date%"
+        "replace": "website",
+        "with": "%episode_link%"
       }
     ]
   },
   "feeds": [
     {
       "name": "Pseudopod",
-      "url": "https://pseudopod.org/feed/podcast/",
-      "mappings": [
-        {
-          "replace": "filename",
-          "with": "%episode_date%-%episode_url_basename%%episode_url_extension%"
-        },
-        {
-          "replace": "tag_title",
-          "with": "%title%"
-        },
-        {
-          "replace": "tag_artist",
-          "with": "%artist%"
-        },
-        {
-          "replace": "tag_album",
-          "with": "%album%"
-        },
-        {
-          "replace": "tag_comment",
-          "with": "%summary%"
-        },
-        {
-          "replace": "tag_date",
-          "with": "%date%"
-        }
-      ]
+      "url": "https://pseudopod.org/feed/podcast/"
     }
   ]
 }

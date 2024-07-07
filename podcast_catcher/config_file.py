@@ -15,13 +15,16 @@ class ConfigFile:
     Global configration settings.
     """
 
-    def __init__(self, download_dir: str, data_dir: str, mappings: dict[str, str]):
+    def __init__(
+      self, download_dir: str, data_dir: str, filename: str, tags: dict[str, str]
+    ):
       """
       CTOR for Settings class.
       """
       self.__download_dir = download_dir
       self.__data_dir = data_dir
-      self.__mappings = mappings
+      self.__filename = filename
+      self.__tags = tags
 
     def download_dir(self) -> str:
       """
@@ -35,11 +38,17 @@ class ConfigFile:
       """
       return self.__data_dir
 
-    def mappings(self) -> dict[str, str]:
+    def filename(self) -> str:
       """
-      Access to mappings dict.
+      Access to filename.
       """
-      return self.__mappings
+      return self.__filename
+
+    def tags(self) -> dict[str, str]:
+      """
+      Access to tag dict.
+      """
+      return self.__tags
 
     def __repr__(self) -> str:
       """
@@ -48,7 +57,8 @@ class ConfigFile:
       items = [
         f"'download_dir': '{self.download_dir()}'",
         f"'data_dir': '{self.data_dir()}'",
-        f"'mappings': {self.mappings()}",
+        f"'filename': '{self.filename()}'",
+        f"'tags': {self.tags()}",
       ]
       return f'{{{', '.join(items)}}}'
 
@@ -62,9 +72,11 @@ class ConfigFile:
       name: str,
       url: str,
       strict_https: bool,
+      enabled: bool,
       download_subdir: str | None,
       skip_older_than: datetime,
-      mappings: dict[str, str],
+      filename: str | None,
+      tags: dict[str, str],
     ):
       """
       CTOR for Feed class.
@@ -72,12 +84,14 @@ class ConfigFile:
       self.__name = name
       self.__url = url
       self.__strict_https = strict_https
+      self.__enabled = enabled
       if download_subdir is not None:
         self.__download_subdir = download_subdir
       else:
         self.__download_subdir = name
       self.__skip_older_than = skip_older_than
-      self.__mappings = mappings
+      self.__filename = filename
+      self.__tags = tags
 
     def name(self) -> str:
       """
@@ -97,17 +111,29 @@ class ConfigFile:
       """
       return self.__strict_https
 
+    def is_enabled(self) -> bool:
+      """
+      Return if the feed is enabled or not.
+      """
+      return self.__enabled
+
     def skip_older_than(self) -> datetime:
       """
       Return reference to skip_older_than.
       """
       return self.__skip_older_than
 
-    def mappings(self) -> dict[str, str]:
+    def tags(self) -> dict[str, str]:
       """
-      Return reference to mappings.
+      Return reference to tags.
       """
-      return self.__mappings
+      return self.__tags
+
+    def filename(self) -> str:
+      """
+      Return filename for the feed.
+      """
+      return self.__filename
 
     def download_subdir(self) -> str:
       """
@@ -125,9 +151,11 @@ class ConfigFile:
         f"'name': '{self.name()}'",
         f"'url': '{self.url()}'",
         f"'strict_https': '{self.is_strict_https()}'",
+        f"'enabled': '{self.is_enabled()}'",
         f"'skip_older_than': '{self.skip_older_than()}'",
         f"'download_subdir': '{self.download_subdir()}'",
-        f"'mappings': {self.mappings()}",
+        f"'filename': '{self.filename()}'",
+        f"'tags': {self.tags()}",
       ]
       return f'{{{', '.join(items)}}}'
 
@@ -150,15 +178,26 @@ class ConfigFile:
     """
     return self.__feeds
 
-  def get_mapping(self, feed: Feed, mapping_key: str) -> str:
+  def get_filename(self, feed: Feed) -> str:
     """
-    Get mapping value for key. Check if feed overrides
-    global mappings.
-    Throws KeyError is mapping_key is in neither dict.
+    Get filename for feed. If a filename
+    entry exists for the feed, use it.
+    Otherwise fall back to settings filename.
     """
-    if mapping_key in feed.mappings():
-      return feed.mappings()[mapping_key]
-    return self.settings().mappings()[mapping_key]
+    if feed.filename() is not None:
+      return feed.filename()
+    return self.settings().filename()
+
+  def get_tags(self, feed: Feed) -> dict[str, str]:
+    """
+    Get joined dict of all tags.
+    """
+    tags = {}
+    for key, value in self.settings().tags().items():
+      tags[key] = value
+    for key, value in feed.tags().items():
+      tags[key] = value
+    return tags
 
   def __repr__(self) -> str:
     """
