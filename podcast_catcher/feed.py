@@ -18,7 +18,7 @@ class Entry:
     self,
     author: str,
     enclosure: str,
-    link: str,
+    link: str | None,
     published: datetime,
     summary: str,
     title: str,
@@ -29,7 +29,7 @@ class Entry:
     """
     self.__author = author
     self.__enclosure = enclosure
-    self.__link = link
+    self.__link = link if link is not None else ''
     self.__published = published
     self.__summary = summary
     self.__title = title
@@ -101,8 +101,10 @@ class Feed:
   Actions on a feed.
   """
 
+  TAG_AUTHOR = 'author'
   TAG_TERM_KEY = 'term'
   TAG_TAGS = 'tags'
+  TAG_LINK = 'link'
   TAG_UPDATED_PARSED = 'updated_parsed'
   TAG_PUBLISHED_PARSED = 'published_parsed'
 
@@ -142,6 +144,7 @@ class Feed:
           file=stderr,
         )
         continue
+      author = entry.author if self.TAG_AUTHOR in entry else entry.title
       enclosure = entry.enclosures[0].href
       if len(entry.enclosures) > 1:
         # TODO: Support preferred enclosure format
@@ -149,9 +152,10 @@ class Feed:
       tags = []
       if self.TAG_TAGS in entry:
         tags = [term[self.TAG_TERM_KEY] for term in entry.tags]
+      link = entry.link if self.TAG_LINK in entry else None
       self.__entries.append(
         Entry(
-          author=entry.author,
+          author=author,
           enclosure=enclosure,
           published=datetime.fromtimestamp(
             timestamp=mktime(entry.published_parsed),
@@ -161,7 +165,7 @@ class Feed:
           # tag scheme and label are ignored
           tags=tags,
           title=entry.title,
-          link=entry.link,
+          link=link,
         )
       )
 
