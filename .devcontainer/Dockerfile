@@ -45,10 +45,10 @@ RUN \
   # Python packages
   python3-build \
   python3-docutils \
-  python3-mutagen \
   python3-feedparser \
   python3-invoke \
   python3-jsonschema \
+  python3-mutagen \
   python3-pygments \
   python3-requests \
   python3-setuptools \
