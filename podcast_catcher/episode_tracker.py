@@ -69,7 +69,7 @@ class EpisodeTracker:
     """
     return [x[self.EPISODE_URL] for x in self.__completed_downloads]
 
-  def latest_entry(self) -> str | None:
+  def latest_entry(self) -> dict[str, str] | None:
     """
     Get latest published and downloaded entry.
     """

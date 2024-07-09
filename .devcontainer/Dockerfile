@@ -42,6 +42,7 @@ RUN \
   # Python
   python3.12 \
   python-is-python3 \
+  python3-pip \
   # Python packages
   python3-build \
   python3-docutils \
@@ -53,6 +54,8 @@ RUN \
   python3-requests \
   python3-setuptools \
   python3-venv \
+  # python typing checker
+  mypy \
   # Set locale to us UTF-8
   && localedef \
   --inputfile=en_US \

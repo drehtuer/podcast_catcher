@@ -192,6 +192,7 @@ def download(config: ConfigFile) -> None:
 
         # Update episode tracker
         episode_tracker.complete(entry)
+        episode_tracker.save()
         print('Done')
         index += 1
     except InterruptedError:

@@ -111,6 +111,11 @@ class Replacer:
       )
     for key, value in self.PLACEHOLDER_ITEMS.items():
       input = input.replace(
-        key, value(name=self.__name, feed=self.__feed, entry=self.__entry)
+        key,
+        value(
+          self.__name,
+          self.__feed,
+          self.__entry,
+        ),
       )
     return input

@@ -3,9 +3,11 @@ Create a config instance
 by loading a JSON file.
 """
 
+from collections.abc import Callable
 from datetime import UTC, datetime
 from json import JSONDecodeError, loads
 from pathlib import Path
+from typing import Any
 
 from config_file import ConfigFile
 from exception import PodcastCatcherError
@@ -37,7 +39,7 @@ class ConfigJsonFactory:
   KEY_SKIP_ODER_THAN = 'skip_older_than'
   KEY_DOWNLOAD_SUBDIR = 'download_subdir'
 
-  def __init__(self, config_filename: str) -> bool:
+  def __init__(self, config_filename: str):
     """
     CTOR, load config schema and file
     content on class initialization.
@@ -71,16 +73,17 @@ class ConfigJsonFactory:
 
   @staticmethod
   def __get_optional(
-    data: dict[str, any], key: str, default: any, func: None = None
-  ) -> any:
+    data: dict[str, Any],
+    key: str,
+    default: Any,
+    func: Callable[[str], Any] = lambda x: x,
+  ) -> Any:
     """
     Try to get key from data. If key
     does not exist, return default instead.
     """
     if key in data:
-      if func:
-        return func(data[key])
-      return data[key]
+      return func(data[key])
     return default
 
   @staticmethod

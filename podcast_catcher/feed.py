@@ -135,7 +135,7 @@ class Feed:
       # TODO: Better solution?
       self.__updated = datetime.now(tz=UTC)
 
-    self.__entries: list[str] = []
+    self.__entries: list[Entry] = []
     for entry in parsed.entries:
       if len(entry.enclosures) < 1:
         print(

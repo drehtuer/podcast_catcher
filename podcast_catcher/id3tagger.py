@@ -2,7 +2,7 @@
 Add/modift id3 tags in media files.
 """
 
-from mutagen.easyid3 import EasyID3, EasyID3FileType
+from mutagen.easyid3 import EasyID3
 
 
 class ID3Tagger:
@@ -14,7 +14,7 @@ class ID3Tagger:
     """
     CTOR for id3tag.
     """
-    self.__mediafile: EasyID3FileType = EasyID3(media_file)
+    self.__mediafile: EasyID3 = EasyID3(media_file)
 
   def save(self) -> None:
     """

@@ -129,7 +129,7 @@ class ConfigFile:
       """
       return self.__tags
 
-    def filename(self) -> str:
+    def filename(self) -> str | None:
       """
       Return filename for the feed.
       """
@@ -184,8 +184,9 @@ class ConfigFile:
     entry exists for the feed, use it.
     Otherwise fall back to settings filename.
     """
-    if feed.filename() is not None:
-      return feed.filename()
+    filename = feed.filename()
+    if filename is not None:
+      return filename
     return self.settings().filename()
 
   def get_tags(self, feed: Feed) -> dict[str, str]:
