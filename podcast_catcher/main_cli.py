@@ -110,37 +110,38 @@ def download(config: ConfigFile) -> None:
   """
   loader = HttpLoader()
   replacer = Replacer()
+  # Ensure base download folder exists
   download_dir = Path(config.settings().download_dir())
   if not download_dir.exists():
     download_dir.mkdir(parents=True)
+  # For each feed:
   for config_feed in config.feeds():
     # Skip feeds not enabled
     if not config_feed.is_enabled:
       continue
-    episode_tracker = EpisodeTracker(config, config_feed.name())
 
-    replacer.update_name(config_feed.name())
+    # Download feed
     feed_text = loader.get_feed(
       url=config_feed.url(),
       verify_https=config_feed.is_strict_https(),
     )
 
+    # Parse feed
     parsed_feed = Feed(feed_text=feed_text)
 
+    # Update replacer settings
+    replacer.update_name(config_feed.name())
     replacer.update_feed(parsed_feed)
 
-    target_dir = download_dir.joinpath(
-      Path(config_feed.download_subdir()),
-    )
-    if not target_dir.exists():
-      target_dir.mkdir(parents=True)
-
+    # Filter out already downloaded episodes
+    episode_tracker = EpisodeTracker(config, config_feed.name())
     already_downloaded = episode_tracker.already_downloaded_links()
     entries = [
       entry
       for entry in parsed_feed.entries()
       if entry.enclosure() not in already_downloaded
     ]
+    # Filter out episodes older than X
     if config_feed.skip_older_than() is not None:
       entries = [
         entry for entry in entries if entry.published() >= config_feed.skip_older_than()
@@ -148,11 +149,25 @@ def download(config: ConfigFile) -> None:
     # Sort entries from oldest to newest
     entries.sort(key=lambda e: e.published())
     print(f'{config_feed.name()} ({len(entries)} new entries)')
+
+    # Ensure target download folder exists,
+    # but only if at least one episode is
+    # available for download
+    target_dir = download_dir.joinpath(
+      Path(config_feed.download_subdir()),
+    )
+    if len(entries) > 0 and not target_dir.exists():
+      target_dir.mkdir(parents=True)
+
     index = 1
     tags = config.get_tags(config_feed)
+    # Handle CRTL-C interrupts
     try:
+      # For all episodes in feed:
       for entry in entries:
+        # Update replacer
         replacer.update_entry(entry)
+
         filename = replacer.replace(config.get_filename(feed=config_feed))
         print(
           f'\t{index}/{len(entries)}: {entry.title()} ({entry.published()})... ',
@@ -160,16 +175,22 @@ def download(config: ConfigFile) -> None:
           flush=True,
         )
         target_file = target_dir.joinpath(Path(f'{filename}'))
+
+        # Download enclosure
         loader.download(
           source=entry.enclosure(),
           target=target_file,
           verify_https=config_feed.is_strict_https(),
         )
+
+        # Tag downloaded enclosure
         tagger = ID3Tagger(target_file)
         for key, value in tags.items():
           tagger.set(key, replacer.replace(value))
         tagger.set('genre', ', '.join(entry.tags()))
         tagger.save()
+
+        # Update episode tracker
         episode_tracker.complete(entry)
         print('Done')
         index += 1

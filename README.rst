@@ -25,8 +25,10 @@ This repo is published under the `GPLv2 license <https://github.com/drehtuer/pod
 Dependencies
 ############
 
-.. _python_build: https://github.com/pypa/build/
+.. _python_build: GitHub<https://github.com/pypa/build/>
 .. _python_build_license: https://github.com/pypa/build/blob/main/LICENSE
+.. _python_docutils: https://sourceforge.net/projects/docutils/
+.. _python_docutils_license: https://sourceforge.net/p/docutils/code/HEAD/tree/trunk/docutils/COPYING.txt
 .. _python_invoke: https://github.com/pyinvoke/invoke
 .. _python_invoke_license: https://github.com/pyinvoke/invoke/blob/main/LICENSE
 .. _python_feedparser: https://github.com/kurtmckee/feedparser
@@ -42,18 +44,19 @@ Dependencies
 .. _python_setuptools: https://github.com/pypa/setuptools
 .. _python_setuptools_license: https://github.com/pypa/setuptools/blob/main/LICENSE
 
-========== ============================ ======= ================================================
-Dependency Link                         Version License
-========== ============================ ======= ================================================
-Build      `GitHub<python_build>`_      1.0.3   `MIT<python_build_license>`_
-feedparser `GitHub<python_feedparser>`_ 6.0.10  `feedparser license<python_feedparser_license>`_
-Invoke     `GitHub<python_invoke>`_     2.0.0   `BSD2<python_invoke_license>`_
-jsonschema `GitHub<python_jsonschema>`_ 4.10.3  `MIT<python_jsonschema_license>`_
-mutagen    `GitHub<python_mutagen>`_    1.46.0  `GPL2<python_mutagen_license>`_
-pygments   `Github<python_pygments>`_   2.17.2  `BSD2<python_pygments_license>`_
-requests   `GitHub<python_requets>`_    2.31.0  `Apache 2.0<python_requests_license>`_
-setuptools `GitHub<python_setuptools>`_ 68.1.2  `MIT<python_setuptools_license>`_
-========== ============================ ======= ================================================
+================================= ======= ==================================================
+Dependency                        Version License
+================================= ======= ==================================================
+`build <python_build>`_           1.0.3   `MIT <python_build_license_>`_
+`docutils <python_docutils>`_     0.20.1  `Multiple licenses <python_docutils_license_>`_
+`feedparser <python_feedparser>`_ 6.0.10  `feedparser license <python_feedparser_license_>`_
+`invoke <python_invoke>`_         2.0.0   `BSD2 <python_invoke_license_>`_
+`jsonschema <python_jsonschema>`_ 4.10.3  `MIT <python_jsonschema_license_>`_
+`mutagen <python_mutagen>`_       1.46.0  `GPL2 <python_mutagen_license_>`_
+`pygments <python_pygments>`_     2.17.2  `BSD2 <python_pygments_license_>`_
+`requests <python_requets>`_      2.31.0  `Apache 2.0 <python_requests_license_>`_
+`setuptools <python_setuptools>`_ 68.1.2  `MIT <python_setuptools_license_>`_
+================================= ======= ==================================================
 
 Installation
 ############
@@ -91,7 +94,41 @@ or via the host's package manager (Ubuntu 24.04):
 Configuration
 =============
 
-TODO
+.. _config_schema: https://github.com/drehtuer/podcast_catcher/blob/main/podcast_catcher/config.schema.json
+.. _config_json: https://github.com/drehtuer/podcast_catcher/blob/main/config/config.json
+.. _mutagen_keys: https://github.com/quodlibet/mutagen/blob/release-1.46.0/mutagen/easyid3.py#L470
+
+Global and per-feed configuration is stored in a JSON config file.
+By default, the file is located at ``~/.config/podcast_catcher/config.json``, but other location can be set using the ``--config`` argument.
+
+Configuration is split between ``settings`` and ``feeds``.
+
+Settings covers global options, e.g. the base ``download_dir`` and ``data_dir``, but also settings wich may be overriden per feed.
+These options may contain placeholders, which will expand per feed.
+
+Entries in the ``tags`` array map ID3 tags and must follow the keys available in `mutagen <mutagen_keys_>`_.
+
+Available placeholders:
+
+* ``%feed_title%``
+* ``%feed_subtitle%``
+* ``%feed_description%``
+* ``%feed_link%``
+* ``%feed_date%``
+* ``%feed_datetime%``
+* ``%episode_date%``
+* ``%episode_datetime%``
+* ``%episode_url_basename%``
+* ``%episode_url_extension%``
+* ``%episode_title%``
+* ``%episode_author%``
+* ``%episode_summary%``
+* ``%episode_link%``
+
+Keep in mind that not all feeds provide the necessary data for each placeholder.
+The ``raw_feed`` subcommand is useful to check what is available for each feed.
+
+For details, check the `example config.json <config_json_>`_ and `JSON schema description <config_schema_>`_.
 
 
 Usage
@@ -102,7 +139,7 @@ podcast_catcher shows a help message if invoked with ``-h`` or ``--help``.
 Global flags:
 
 * ``--config``: Provide a non-standard location of the configuration file.
-  Default location is `~/.config/podcast_catcher/config.json`.
+  Default location is ``~/.config/podcast_catcher/config.json``.
 
 Subcommands:
 
