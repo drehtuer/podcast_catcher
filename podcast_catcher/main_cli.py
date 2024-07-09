@@ -197,10 +197,6 @@ def download(config: ConfigFile) -> None:
     except InterruptedError:
       # Silently abort via CRTL-C
       # (no stack trace).
-      pass
-    except Exception as e:
-      raise e
-    finally:
       # Ensure the tracker is saved at the end
       episode_tracker.save()
 
