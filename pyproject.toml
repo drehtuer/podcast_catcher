@@ -6,20 +6,31 @@ build-backend = "setuptools.build_meta"
 [project]
 license = { file = 'LICENSE' }
 name = "podcast_catcher"
-authors = [{ name = 'Karsten Brand', email = 'karsten@drehtuer.de' }]
+authors = [{ name = 'Drehtuer', email = 'drehtuer@drehtuer.de' }]
 description = 'Simple podcast catcher, which offers flexible renaming and ID3 re-tagging options.'
 readme = 'README.rst'
 requires-python = '>=3.8'
 classifiers = [
-  'Development Status :: 3 - Alpha',
+  'Development Status :: 4 - Beta',
   'Programming Language :: Python :: 3',
-  'Operating System :: OS Independent',
   'Multimedia :: Sound/Audio',
   'Internet :: WWW/HTTP',
 ]
 keywords = ['rss', 'atom', 'podcast']
-dependencies = ['requests>=2.31.0', 'eyed3>=0.9.7', 'feedparser>=6.0.10']
+dependencies = [
+  'feedparser==6.0.10',
+  'jsonschema==4.10.3',
+  'mutagen==1.46.0',
+  'requests==2.31.0',
+]
 dynamic = ['version']
+
+[tool.setuptools.packages.find]
+include = ['podcast_catcher']
+exclude = ['config']
+
+[tool.setuptools.dynamic]
+version = { attr = 'podcast_catcher.__version__' }
 
 [project.urls]
 Homepage = 'https://github.com/drehtuer/podcast_catcher'
