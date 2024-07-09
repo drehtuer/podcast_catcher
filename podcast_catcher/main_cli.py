@@ -63,11 +63,6 @@ def build_argument_parser() -> ArgumentParser:
     default=DEFAULT_CONFIG,
     help=f'Configuration file (default {DEFAULT_CONFIG})',
   )
-  parser.add_argument(
-    '--verbose',
-    action='store_true',
-    help='Enable verbose output',
-  )
 
   sub_parsers = parser.add_subparsers(
     required=True,
