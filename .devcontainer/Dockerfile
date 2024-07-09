@@ -74,7 +74,3 @@ RUN \
   ${ARG_USER}
 
 USER ${ARG_USER}
-
-# Keep container running, vscode needs to
-# attach to it.
-CMD [ "sleep", "infinity" ]
