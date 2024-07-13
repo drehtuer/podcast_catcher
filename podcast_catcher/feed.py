@@ -116,7 +116,10 @@ class Feed:
     self.__title = parsed.feed.title
     self.__subtitle = parsed.feed.subtitle
     self.__description = parsed.feed.description
-    self.__link = parsed.feed.link
+    if self.TAG_LINK in parsed.feed:
+      self.__link = parsed.feed.link
+    else:
+      self.__link = None
     # feedparser uses the fallback to 'published_parsed' if
     # 'updated_parsed' doesn't exist, but this mapping is
     # temporarily and may be removed in the future. Mapping
@@ -187,7 +190,7 @@ class Feed:
     """
     return self.__description
 
-  def link(self) -> str:
+  def link(self) -> str | None:
     """
     Return link to the feed source.
     """

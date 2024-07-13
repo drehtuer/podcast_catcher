@@ -34,7 +34,7 @@ class Replacer:
     entry: feed.description(),
     f'{PLACEHOLDER_TOKEN}feed_link{PLACEHOLDER_TOKEN}': lambda name,
     feed,
-    entry: feed.link(),
+    entry: feed.link() if feed.link() is not None else '',
     f'{PLACEHOLDER_TOKEN}feed_date{PLACEHOLDER_TOKEN}': lambda name,
     feed,
     entry: feed.updated().strftime('%Y%m%d'),
@@ -65,7 +65,7 @@ class Replacer:
     entry: entry.summary(),
     f'{PLACEHOLDER_TOKEN}episode_link{PLACEHOLDER_TOKEN}': lambda name,
     feed,
-    entry: entry.link(),
+    entry: entry.link() if entry.link() is not None else '',
   }
 
   def __init__(self):
