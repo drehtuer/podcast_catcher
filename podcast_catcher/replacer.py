@@ -5,6 +5,7 @@ Flexible string replacer class.
 from collections.abc import Callable
 from pathlib import Path
 from urllib.parse import urlparse
+from functools import reduce
 
 from exception import PodcastCatcherError
 from feed import Entry, Feed
@@ -17,6 +18,9 @@ class Replacer:
   """
 
   PLACEHOLDER_TOKEN = '%'
+  ILLEGAL_CHARACTERS = ['<', '>', ':', '"', '/', '\\', '|', '?', '*']
+  SANITIZE_TOKEN = '_'
+
   PLACEHOLDER_ITEMS: dict[str, Callable[[str, Feed, Entry], str]] = {
     # Config properties
     f'{PLACEHOLDER_TOKEN}config_name{PLACEHOLDER_TOKEN}': lambda name,
@@ -57,6 +61,8 @@ class Replacer:
     f'{PLACEHOLDER_TOKEN}episode_title{PLACEHOLDER_TOKEN}': lambda name,
     feed,
     entry: entry.title(),
+    f'{PLACEHOLDER_TOKEN}episode_title_safe{PLACEHOLDER_TOKEN}': lambda name, feed,
+    entry: reduce(lambda str, repl: str.replace(repl, Replacer.SANITIZE_TOKEN), [entry.title()] + Replacer.ILLEGAL_CHARACTERS).lstrip().rstrip(),
     f'{PLACEHOLDER_TOKEN}episode_author{PLACEHOLDER_TOKEN}': lambda name,
     feed,
     entry: entry.author(),
