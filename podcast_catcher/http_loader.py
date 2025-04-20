@@ -19,9 +19,12 @@ class HttpLoader:
     """
     Fetch a feed via HTTP(S).
     """
-    request = requests.get(url, verify=verify_https)
-    if request.status_code != 200:
-      raise PodcastCatcherError(f'HTTP error: {request.status_code}')
+    try:
+      request = requests.get(url, verify=verify_https)
+      if request.status_code != 200:
+        raise PodcastCatcherError(f'HTTP error for feed {url}: {request.status_code}')
+    except requests.ConnectTimeout as e:
+      raise PodcastCatcherError(f'HTTP timeout for feed {url}: {e}')
     return request.text
 
   def download(self, source: str, target: str, verify_https: bool = True) -> None:
